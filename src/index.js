@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 const board = [
   "0,0",
   "0,1",
@@ -92,6 +93,9 @@ function getAllMoves(space) {
   return moveArray.map((move) => move.toString());
 }
 
+// Create adjacencyList
+const adjacencyList = new Map();
+
 function addNode(startingSpace) {
   adjacencyList.set(startingSpace, []);
 }
@@ -100,8 +104,6 @@ function addEdge(startingSpace, possibleMove) {
   adjacencyList.get(startingSpace).push(possibleMove);
 }
 
-//Create adjacencyList
-const adjacencyList = new Map();
 board.forEach((space) => {
   addNode(space);
 });
@@ -110,3 +112,33 @@ board.forEach((space) => {
     addEdge(space, possibleMove);
   });
 });
+
+function bfs(startingSpace, endingSpace) {
+  if (startingSpace === endingSpace) {
+    return [startingSpace];
+  }
+  const visited = new Set();
+  const queue = [[startingSpace, [startingSpace]]]; // Store vertices and routes
+
+  while (queue.length > 0) {
+    const currVertex = queue.shift(); // Get the next vertex in the list
+    const currSpace = currVertex[0];
+    const currRoute = currVertex[1];
+    const possibleMoves = adjacencyList.get(currSpace); // Visit the vertex and get all possible moves from there
+    for (const possibleMove of possibleMoves) {
+      // If end is found from vertex return the current route
+      if (possibleMove === endingSpace) {
+        return [...currRoute, endingSpace];
+      }
+
+      // Push unvisited space to the queue and update its route
+      if (!visited.has(possibleMove)) {
+        visited.add(possibleMove);
+        queue.push([possibleMove, [...currRoute, possibleMove]]);
+      }
+    }
+  }
+}
+
+console.log(adjacencyList);
+console.log(bfs("0,0", "7,7"));
